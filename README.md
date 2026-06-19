@@ -89,6 +89,6 @@ sql/                 → schema database
 
 ---
 
-**Link Deployment:** 
-**Link Documentation API:** https://documenter.getpostman.com/view/39224648/2sBXwvJ8gj
-**Link PPT:** https://docs.google.com/presentation/d/19WO23XmIxjRtmxiUdIz7dYjXOziNdf5-/edit?usp=sharing&ouid=109819096331892243259&rtpof=true&sd=true
+- **Link Deployment:** https://ticketing-system-production-ec0f.up.railway.app 
+- **Link Documentation API:** https://documenter.getpostman.com/view/39224648/2sBXwvJ8gj
+- **Link PPT:** https://docs.google.com/presentation/d/19WO23XmIxjRtmxiUdIz7dYjXOziNdf5-/edit?usp=sharing&ouid=109819096331892243259&rtpof=true&sd=true
