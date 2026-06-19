@@ -30,4 +30,5 @@ func RegisterPath(
 
 	routes := api.Group("/routes")
 	routes.GET("", ctrlRoute.GetAll)
+	routes.GET("/:id", ctrlRoute.GetByID)
 }

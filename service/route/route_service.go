@@ -12,6 +12,7 @@ type service struct {
 
 type Service interface {
 	GetAll(filter SearchFilter) ([]Route, error)
+	GetByID(id int) (Route, error)
 }
 
 func NewService(logger *slog.Logger, repo Repository) Service {
@@ -30,4 +31,14 @@ func (s *service) GetAll(filter SearchFilter) ([]Route, error) {
 	}
 
 	return routes, nil
+}
+
+func (s *service) GetByID(id int) (Route, error) {
+	r, err := s.repo.GetByID(id)
+	if err != nil {
+		return Route{}, errors.New("route not found")
+	}
+
+	r.Available = r.Quota - r.Sold
+	return r, nil
 }

@@ -47,3 +47,10 @@ func (r *GormRepository) UpdateSold(id, newSold int) error {
 		Where("id = ?", id).
 		Update("sold", newSold).Error
 }
+
+func (r *GormRepository) GetByID(id int) (route.Route, error) {
+	ctx := context.Background()
+	var rt route.Route
+	result := r.db.WithContext(ctx).First(&rt, id)
+	return rt, result.Error
+}
