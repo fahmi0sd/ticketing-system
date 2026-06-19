@@ -10,9 +10,12 @@ import (
 	"time"
 
 	"github.com/fahmi0sd/go-utils/postgres"
+	routeCtrl "github.com/fahmi0sd/ticketing-system/app/echo-server/controller/route"
 	userCtrl "github.com/fahmi0sd/ticketing-system/app/echo-server/controller/user"
 	"github.com/fahmi0sd/ticketing-system/app/echo-server/router"
+	routeRepo "github.com/fahmi0sd/ticketing-system/repository/route"
 	userRepo "github.com/fahmi0sd/ticketing-system/repository/user"
+	routeSvc "github.com/fahmi0sd/ticketing-system/service/route"
 	userSvc "github.com/fahmi0sd/ticketing-system/service/user"
 	"github.com/joho/godotenv"
 	"github.com/labstack/echo/v4"
@@ -33,12 +36,15 @@ func main() {
 
 	// Repositories
 	usrRepo := userRepo.NewGormRepository(database)
+	rtRepo := routeRepo.NewGormRepository(database)
 
 	// Services
 	usrSvc := userSvc.NewService(logger, usrRepo, jwtSecret)
+	rtSvc := routeSvc.NewService(logger, rtRepo)
 
 	// Controllers
 	usrCtrl := userCtrl.NewController(logger, usrSvc)
+	rtCtrl := routeCtrl.NewController(logger, rtSvc)
 
 	// Echo
 	e := echo.New()
@@ -52,7 +58,7 @@ func main() {
 	}))
 	e.Pre(middleware.RemoveTrailingSlash())
 
-	router.RegisterPath(e, jwtSecret, usrCtrl)
+	router.RegisterPath(e, jwtSecret, usrCtrl, rtCtrl)
 
 	port := os.Getenv("PORT")
 	if port == "" {
