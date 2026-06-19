@@ -10,11 +10,15 @@ import (
 	"time"
 
 	"github.com/fahmi0sd/go-utils/postgres"
+	bookingCtrl "github.com/fahmi0sd/ticketing-system/app/echo-server/controller/booking"
 	routeCtrl "github.com/fahmi0sd/ticketing-system/app/echo-server/controller/route"
 	userCtrl "github.com/fahmi0sd/ticketing-system/app/echo-server/controller/user"
 	"github.com/fahmi0sd/ticketing-system/app/echo-server/router"
+	midtrans "github.com/fahmi0sd/ticketing-system/pkg"
+	bookingRepo "github.com/fahmi0sd/ticketing-system/repository/booking"
 	routeRepo "github.com/fahmi0sd/ticketing-system/repository/route"
 	userRepo "github.com/fahmi0sd/ticketing-system/repository/user"
+	bookingSvc "github.com/fahmi0sd/ticketing-system/service/booking"
 	routeSvc "github.com/fahmi0sd/ticketing-system/service/route"
 	userSvc "github.com/fahmi0sd/ticketing-system/service/user"
 	"github.com/joho/godotenv"
@@ -33,18 +37,26 @@ func main() {
 
 	// Config
 	jwtSecret := os.Getenv("JWT_SECRET")
+	midtransKey := os.Getenv("MIDTRANS_SERVER_KEY")
+	midtransSnapURL := os.Getenv("MIDTRANS_SNAP_URL")
+
+	midtransClient := midtrans.NewClient(midtransKey, midtransSnapURL)
+	logger.Info("midtrans client initialized", slog.String("snap_url", midtransSnapURL))
 
 	// Repositories
 	usrRepo := userRepo.NewGormRepository(database)
 	rtRepo := routeRepo.NewGormRepository(database)
+	bkgRepo := bookingRepo.NewGormRepository(database)
 
 	// Services
 	usrSvc := userSvc.NewService(logger, usrRepo, jwtSecret)
 	rtSvc := routeSvc.NewService(logger, rtRepo)
+	bkgSvc := bookingSvc.NewService(logger, bkgRepo, rtRepo, midtransClient, midtransKey)
 
 	// Controllers
 	usrCtrl := userCtrl.NewController(logger, usrSvc)
 	rtCtrl := routeCtrl.NewController(logger, rtSvc)
+	bkgCtrl := bookingCtrl.NewController(logger, bkgSvc)
 
 	// Echo
 	e := echo.New()
@@ -58,7 +70,7 @@ func main() {
 	}))
 	e.Pre(middleware.RemoveTrailingSlash())
 
-	router.RegisterPath(e, jwtSecret, usrCtrl, rtCtrl)
+	router.RegisterPath(e, jwtSecret, usrCtrl, rtCtrl, bkgCtrl)
 
 	port := os.Getenv("PORT")
 	if port == "" {
